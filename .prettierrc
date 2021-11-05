@@ -1,11 +1,10 @@
 {
-  "extends": ["prettier"],
-  "plugins": ["prettier"],
-  "rules": {
-    "prettier/prettier": "error",
-    "arrow-body-style": "off",
-    "prefer-arrow-callback": "off",
-    "tabWidth": 4,
-    "semi": true
-  }
+	"parser": "typescript", 
+	"prettier/prettier": "error",
+	"printWidth": 120,
+	"arrow-body-style": "off",
+	"prefer-arrow-callback": "off",
+	"useTabs": true,
+	"tabWidth": 4,
+	"semi": true
 }

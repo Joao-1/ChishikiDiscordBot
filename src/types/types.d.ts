@@ -2,7 +2,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { Collection, Message } from "discord.js";
 import Bot from "../bot";
-
 export interface IConfig {
 	clientId: string;
 	token: string;

@@ -1,7 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { Collection, Message } from "discord.js";
+import { Collection, CommandInteraction, Message } from "discord.js";
 import Bot from "../bot";
+
 export interface IConfig {
 	clientId: string;
 	token: string;
@@ -24,8 +25,16 @@ export interface IPropertiesThatCanBeUpdated {
 }
 
 export interface ICommand {
+	// eslint-disable-next-line func-names
+	[Symbol.iterator] = function* () {
+		let properties = Object.keys(this);
+		for (let i of properties) {
+			yield [i, this[i]];
+		}
+	};
 	data: SlashCommandBuilder;
-	thisIsGlobal: boolean;
+	scope: "global" | "private" | "custom";
+	allowedServers?: string[];
 	execute(interaction: CommandInteraction | Message, guildCached: IGuild, bot: Bot): void;
 }
 

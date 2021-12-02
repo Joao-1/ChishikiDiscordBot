@@ -15,18 +15,17 @@ export default class SlashCommandsInAGuild implements SlashCommandsRest {
 		this.clientId = clientId;
 	}
 
-	async deploy(commands: Collection<string, ICommand>, guildId: string) {
+	async deploy(commands: Collection<string, ICommand>, specificGuildId?: string) {
 		const commandsToDeployInAGuild = transformCommandsToJson(commands);
 
-		try {
-			await this.restMethods.put(
-				Routes.applicationGuildCommands(this.clientId as `${bigint}`, guildId as `${bigint}`),
-				{
-					body: commandsToDeployInAGuild,
-				}
-			);
-		} catch (error) {
-			logger.error(error);
+		if (specificGuildId) {
+			this.executeDeploy(specificGuildId, commandsToDeployInAGuild);
+		} else {
+			for (const commandsDetails of commands.values()) {
+				commandsDetails.allowedServers?.forEach(async (guildId) => {
+					this.executeDeploy(guildId, commandsToDeployInAGuild);
+				});
+			}
 		}
 	}
 
@@ -46,6 +45,19 @@ export default class SlashCommandsInAGuild implements SlashCommandsRest {
 					guildId as `${bigint}`,
 					localCommandToDelete.id as `${bigint}`
 				)
+			);
+		} catch (error) {
+			logger.error(error);
+		}
+	}
+
+	private async executeDeploy(serverId: string, commandsToDeployInAGuild: unknown[]) {
+		try {
+			await this.restMethods.put(
+				Routes.applicationGuildCommands(this.clientId as `${bigint}`, serverId as `${bigint}`),
+				{
+					body: commandsToDeployInAGuild,
+				}
 			);
 		} catch (error) {
 			logger.error(error);

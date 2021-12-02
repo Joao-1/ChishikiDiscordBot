@@ -4,7 +4,7 @@ import Bot from "../../../bot";
 
 export default {
 	data: new SlashCommandBuilder().setName("ping").setDescription("Replies with pong?"),
-	thisIsGlobal: true,
+	scope: "global",
 	async execute(interaction: BaseCommandInteraction, bot: Bot) {
 		const newEmbed = new MessageEmbed()
 			.setColor("BLUE")

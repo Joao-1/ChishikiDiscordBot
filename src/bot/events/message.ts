@@ -28,11 +28,14 @@ export default {
 		const typedCommand = messageContent.shift();
 		if (!typedCommand) return;
 
-		const commandFrombot = bot.commands.get(typedCommand);
-		if (!commandFrombot) return;
-
+		const commandFromBot = bot.commands.get(typedCommand);
+		if (!commandFromBot) return;
+		if (!commandFromBot.allowedServers?.includes(message.guild.id)) {
+			message.reply("sem permissão!");
+			return;
+		}
 		try {
-			commandFrombot.execute(message, guildCached, bot);
+			commandFromBot.execute(message, guildCached, bot);
 		} catch (error) {
 			logger.error(error);
 		}

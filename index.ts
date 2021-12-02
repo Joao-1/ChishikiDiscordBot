@@ -5,20 +5,18 @@ import Bot from "./src/bot";
 import config from "./src/config/config";
 import SlashCommandsGlobally from "./src/helpers/slashCommands/slashCommandGlobally";
 import SlashCommandsInAGuild from "./src/helpers/slashCommands/slashCommandsInAGuild";
-import { SlashCommandsRest } from "./src/types/types.d";
 
 const { clientId, token, intents } = config;
 if (!token || !clientId) throw new Error("Missing Token or ClientId");
 
 const chishikiAPI = new ChishikiAPI();
-let slashCommandsMethods: SlashCommandsRest;
 
-// eslint-disable-next-line no-unused-expressions
-(process.env.NODE_ENV as string).trim() === "dev"
-	? (slashCommandsMethods = new SlashCommandsInAGuild(clientId, token))
-	: (slashCommandsMethods = new SlashCommandsGlobally(clientId, token));
-
-const bot = new Bot(intents, chishikiAPI, slashCommandsMethods);
+const bot = new Bot(
+	intents,
+	chishikiAPI,
+	new SlashCommandsGlobally(clientId, token),
+	new SlashCommandsInAGuild(clientId, token)
+);
 
 (async () => {
 	await axios

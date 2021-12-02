@@ -3,7 +3,8 @@ import { BaseCommandInteraction, MessageEmbed } from "discord.js";
 
 export default {
 	data: new SlashCommandBuilder().setName("a").setDescription("a"),
-	thisIsGlobal: true,
+	scope: "global",
+	allowedServers: ["598200219665956895"],
 	async execute(interaction: BaseCommandInteraction) {
 		const newEmbed = new MessageEmbed()
 			.setColor("BLUE")

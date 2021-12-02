@@ -15,7 +15,7 @@ export default {
 				.addChoice("to english", "english")
 				.addChoice("to japonese", "japonese")
 		),
-	thisIsGlobal: true,
+	scope: "global",
 
 	async execute(interaction: CommandInteraction, guildCached: IGuildCache, bot: Bot) {
 		if (!interaction.options.data[0]) {

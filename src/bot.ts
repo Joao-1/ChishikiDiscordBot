@@ -13,12 +13,20 @@ class Bot extends Client {
 
 	public API: IBotAPI;
 
-	private slashCommandsMethods: SlashCommandsRest;
+	private globalCommandsMethods: SlashCommandsRest;
 
-	constructor(clientOptions: ClientOptions, api: IBotAPI, slashCommandsMethods: SlashCommandsRest) {
+	private privateCommandsMethods: SlashCommandsRest;
+
+	constructor(
+		clientOptions: ClientOptions,
+		API: IBotAPI,
+		globalCommandsMethods: SlashCommandsRest,
+		privateCommandsMethods: SlashCommandsRest
+	) {
 		super(clientOptions);
-		this.API = api;
-		this.slashCommandsMethods = slashCommandsMethods;
+		this.API = API;
+		this.globalCommandsMethods = globalCommandsMethods;
+		this.privateCommandsMethods = privateCommandsMethods;
 	}
 
 	async start(config: IConfig) {
@@ -28,7 +36,7 @@ class Bot extends Client {
 			await this.loadCache();
 			await this.login(config.token);
 			await this.syncData();
-			await this.slashCommandsMethods.deploy(this.commands, "751646711251730452");
+			await this.deployCommands();
 		} catch (error) {
 			console.log(error);
 			logger.error(error);
@@ -41,7 +49,7 @@ class Bot extends Client {
 		commandFiles.forEach(async (pathToCommand: string) => {
 			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const command: ICommand = require(pathToCommand).default;
-			if (command.thisIsGlobal) this.commands.set(command.data.name, command);
+			this.commands.set(command.data.name, command);
 		});
 	}
 
@@ -76,6 +84,17 @@ class Bot extends Client {
 		allGuilds.forEach((guild) => {
 			this.cache.set(guild.id, guild, 60000);
 		});
+	}
+
+	async deployCommands() {
+		await this.globalCommandsMethods.deploy(
+			this.commands.filter((commandsDetails) => commandsDetails.scope === "global")
+		);
+		await this.privateCommandsMethods.deploy(
+			this.commands.filter(
+				(commandsDetails) => commandsDetails.scope === "private" || commandsDetails.scope === "custom"
+			)
+		);
 	}
 
 	async registerNewGuildInSystem(guildId: string) {

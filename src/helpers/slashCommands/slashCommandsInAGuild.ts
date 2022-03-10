@@ -1,30 +1,27 @@
 import { REST } from "@discordjs/rest";
 import { Routes } from "discord-api-types/rest/v9";
-import { ApplicationCommand, Collection } from "discord.js";
+import { ApplicationCommand } from "discord.js";
 import logger from "../../../logs/logger";
-import { ICommand, SlashCommandsRest } from "../../types/types";
-import transformCommandsToJson from "../../utils/transformCommandsToJson";
+import { ICommandExecute } from "../../structure";
+import { SlashCommandsRest } from "./structure";
 
 export default class SlashCommandsInAGuild implements SlashCommandsRest {
-	private restMethods: REST;
+	private restMethods: REST = new REST({ version: "9" });
 
-	private clientId: string;
-
-	constructor(clientId: string, token: string) {
-		this.restMethods = new REST({ version: "9" }).setToken(token);
-		this.clientId = clientId;
+	// eslint-disable-next-line no-unused-vars
+	constructor(private clientId: string, token: string) {
+		this.restMethods = this.restMethods.setToken(token);
 	}
 
-	async deploy(commands: Collection<string, ICommand>, specificGuildId?: string) {
-		const commandsToDeployInAGuild = transformCommandsToJson(commands);
-
-		if (specificGuildId) {
-			this.executeDeploy(specificGuildId, commandsToDeployInAGuild);
-		} else {
-			for (const commandsDetails of commands.values()) {
-				commandsDetails.allowedServers?.forEach(async (guildId) => {
-					this.executeDeploy(guildId, commandsToDeployInAGuild);
-				});
+	async deploy(commands: ICommandExecute, specificsGuildsIds?: string[]) {
+		if (specificsGuildsIds) {
+			for (let i = 0; i <= specificsGuildsIds.length; i += 1) {
+				this.restMethods.put(
+					Routes.applicationGuildCommands(this.clientId as `${bigint}`, serverId as `${bigint}`),
+					{
+						body: commandsToDeployInAGuild,
+					}
+				) as unknown as ApplicationCommand[];
 			}
 		}
 	}
@@ -51,16 +48,17 @@ export default class SlashCommandsInAGuild implements SlashCommandsRest {
 		}
 	}
 
-	private async executeDeploy(serverId: string, commandsToDeployInAGuild: unknown[]) {
+	private async executeDeploy(serverId: string, commandsToDeployInAGuild: unknown) {
 		try {
-			await this.restMethods.put(
+			return this.restMethods.put(
 				Routes.applicationGuildCommands(this.clientId as `${bigint}`, serverId as `${bigint}`),
 				{
 					body: commandsToDeployInAGuild,
 				}
-			);
+			) as unknown as ApplicationCommand[];
 		} catch (error) {
 			logger.error(error);
+			throw error;
 		}
 	}
 }

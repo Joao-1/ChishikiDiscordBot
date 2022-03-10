@@ -1,5 +1,5 @@
 import Redis from "ioredis";
-import { IGuildCache } from "../types/types.d";
+import { IGuildCache } from "../structure";
 
 class Cache {
 	private redis;

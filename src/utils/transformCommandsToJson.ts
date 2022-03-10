@@ -1,12 +1,7 @@
-import { Collection } from "discord.js";
-import { ICommand } from "../types/types";
+import { ICommandExecute } from "../structure.d";
 
-export default (commands: Collection<string, ICommand>) => {
+export default (commands: ICommandExecute) => {
 	const commandsToDeploy: unknown[] = [];
 
-	commands.forEach((command: ICommand) => {
-		commandsToDeploy.push(command.data.toJSON());
-	});
-
-	return commandsToDeploy;
+	return commandsToDeploy.push(command.data.toJSON());
 };

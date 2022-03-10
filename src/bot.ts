@@ -1,44 +1,38 @@
+/* eslint-disable no-unused-vars */
 import { Client, ClientOptions, Collection } from "discord.js";
 import glob from "glob";
 import { promisify } from "util";
 import logger from "../logs/logger";
+import { IBotAPI } from "./APIs/chishikiAPI/structure";
 import Cache from "./cache/cache";
-import { ICommand, IConfig, IGuild } from "./types/types";
-import { IBotAPI, SlashCommandsRest } from "./types/types.d";
+import { SlashCommandsRest } from "./helpers/slashCommands/structure";
+import { IConfig, IGuild } from "./structure";
+import { ICommandExecute } from "./structure.d";
 
-class Bot extends Client {
-	public commands: Collection<string, ICommand> = new Collection();
+export default class Bot extends Client {
+	public commands: Collection<string, ICommandExecute> = new Collection();
 
 	public cache: Cache;
 
-	public API: IBotAPI;
-
-	private globalCommandsMethods: SlashCommandsRest;
-
-	private privateCommandsMethods: SlashCommandsRest;
-
 	constructor(
 		clientOptions: ClientOptions,
-		API: IBotAPI,
-		globalCommandsMethods: SlashCommandsRest,
-		privateCommandsMethods: SlashCommandsRest
+		readonly API: IBotAPI,
+		private globalCommandsMethods: SlashCommandsRest,
+		private privateCommandsMethods: SlashCommandsRest
 	) {
 		super(clientOptions);
-		this.API = API;
-		this.globalCommandsMethods = globalCommandsMethods;
-		this.privateCommandsMethods = privateCommandsMethods;
 	}
 
 	async start(config: IConfig) {
 		try {
 			await this.loadEvents();
 			await this.loadCommands();
-			await this.loadCache();
+			// await this.loadCache();
 			await this.login(config.token);
-			await this.syncData();
-			await this.deployCommands();
+			await this.deployCommands(config.discordServerDefault);
+			await this.syncGuilds();
+			// await this.syncCommands();
 		} catch (error) {
-			console.log(error);
 			logger.error(error);
 			process.exit();
 		}
@@ -46,9 +40,9 @@ class Bot extends Client {
 
 	async loadCommands() {
 		const commandFiles: string[] = await promisify(glob)(`${__dirname}/bot/commands/**/*{.ts,.js}`);
+
 		commandFiles.forEach(async (pathToCommand: string) => {
-			// eslint-disable-next-line @typescript-eslint/no-var-requires
-			const command: ICommand = require(pathToCommand).default;
+			const command: ICommandExecute = require(pathToCommand).default;
 			this.commands.set(command.data.name, command);
 		});
 	}
@@ -57,7 +51,6 @@ class Bot extends Client {
 		const eventFiles: string[] = await promisify(glob)(`${__dirname}/bot/events/**/*{.ts,.js}`);
 
 		eventFiles.forEach(async (value: string) => {
-			// eslint-disable-next-line @typescript-eslint/no-var-requires
 			const event = require(value).default;
 			if (event.once === "true") {
 				this.once(event.name, (...args) => event.execute(...args, this));
@@ -71,37 +64,50 @@ class Bot extends Client {
 		this.cache = new Cache();
 	}
 
-	async syncData() {
-		const allGuilds: IGuild[] = await this.API.getAllGuilds();
-
-		this.guilds.cache.forEach(async (guild) => {
-			if (!allGuilds.some((existingGuild) => existingGuild.id === guild.id)) {
-				const newGuild = await this.API.registerGuild(guild.id);
-				allGuilds.push(newGuild);
-			}
-		});
-
-		allGuilds.forEach((guild) => {
-			this.cache.set(guild.id, guild, 60000);
-		});
-	}
-
-	async deployCommands() {
+	async deployCommands(discordServerDefault: string) {
 		await this.globalCommandsMethods.deploy(
-			this.commands.filter((commandsDetails) => commandsDetails.scope === "global")
+			this.commands.filter((commandsDetails) => commandsDetails.scope === "public")
 		);
 		await this.privateCommandsMethods.deploy(
 			this.commands.filter(
-				(commandsDetails) => commandsDetails.scope === "private" || commandsDetails.scope === "custom"
+				(commandsDetails) => commandsDetails.scope === "private" || commandsDetails.scope === "custom",
+				discordServerDefault
 			)
 		);
 	}
 
-	async registerNewGuildInSystem(guildId: string) {
-		const newGuild = await this.API.registerGuild(guildId);
-		await this.cache.set(guildId, newGuild, 60000);
-		return this.cache.get(guildId);
-	}
-}
+	async syncGuilds() {
+		const allGuildsInAPI: IGuild[] = await this.API.guilds.getAll();
 
-export default Bot;
+		this.guilds.cache.forEach(async (guildInDiscord) => {
+			if (!allGuildsInAPI.some((guildsInAPI) => guildsInAPI.id === guildInDiscord.id)) {
+				const newGuild = await this.API.guilds.register(guildInDiscord.id);
+				allGuildsInAPI.push(newGuild);
+			}
+		});
+
+		allGuildsInAPI.forEach((guild) => {
+			this.cache.set(guild.id, guild, 60000);
+		});
+	}
+
+	// async syncCommands() {
+	// 	const allCommandsInAPI: ICommandAPI[] = await this.API.commands.getAll();
+
+	// 	this.commands.forEach(async (commandLoaded) => {
+	// 		if (!allCommandsInAPI.some((commandsInAPI) => commandsInAPI.name === commandLoaded.data.name)) {
+	// 			const newCommands = await this.API.commands.register(commandLoaded.data.name, commandLoaded.scope);
+	// 			allCommandsInAPI.push(newCommands);
+	// 		}
+	// 	});
+	// 	allCommandsInAPI.forEach((command) => {
+	// 		this.cache.set(command.name, command, 60000);
+	// 	});
+	// }
+
+	// async registerNewGuildInSystem(guildId: string) {
+	// 	const newGuild = await this.API.registerGuild(guildId);
+	// 	await this.cache.set(guildId, newGuild, 60000);
+	// 	return this.cache.get(guildId);
+	// }
+}

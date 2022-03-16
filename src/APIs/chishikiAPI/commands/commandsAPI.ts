@@ -4,9 +4,26 @@ import { ICommandAPI } from "../../../structure.d";
 import { ICommandsMethods } from "../structure.d";
 
 export default class CommandsAPI implements ICommandsMethods {
-	async register(commandId: string, scope: "public" | "private" | "custom") {
-		const newCommand = await axios.post(`${config.apiURL}/commands`, { id: commandId, scope });
-		if (!newCommand.data) throw new Error("It was not possible to register a new command");
-		return newCommand.data as unknown as ICommandAPI;
+	async register(name: string, description: string, scope: "public" | "private" | "custom") {
+		try {
+			const newGuild = await axios.post(`${config.apiURL}/commands`, {
+				name,
+				description,
+				scope,
+			});
+			return newGuild.data as unknown as ICommandAPI;
+		} catch (error: any) {
+			console.log(error.response.data);
+			throw new Error(error);
+		}
+	}
+
+	async get() {
+		try {
+			const guilds = await axios.get(`${config.apiURL}/commands`);
+			return guilds.data.guilds as unknown as ICommandAPI[];
+		} catch (error: any) {
+			throw new Error(error.data);
+		}
 	}
 }

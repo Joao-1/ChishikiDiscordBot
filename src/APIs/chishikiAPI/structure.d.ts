@@ -7,13 +7,14 @@ export interface IPropertiesThatCanBeUpdated {
 }
 
 export interface IGuildsMethods {
-	getAll(): Promise<IGuild[]>;
 	register(guild: string): Promise<IGuild>;
+	getAll(): Promise<IGuild[]>;
 	update(guildId: string, newValues: IPropertiesThatCanBeUpdated): unknown;
 }
 
 export interface ICommandsMethods {
-	register(commandId: string, scope: "public" | "private" | "custom"): Promise<ICommandAPI>;
+	register(name: string, description: string, scope: "public" | "private" | "custom"): Promise<ICommandAPI>;
+	get(): Promise<ICommandAPI[]>;
 }
 
 export interface IBotAPI {

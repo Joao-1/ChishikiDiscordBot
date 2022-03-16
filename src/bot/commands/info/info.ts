@@ -1,5 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { BaseCommandInteraction } from "discord.js";
+import { ICommandExecute } from "../../../structure";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -11,4 +12,4 @@ export default {
 	async execute(interaction: BaseCommandInteraction) {
 		await interaction.reply("info!");
 	},
-};
+} as ICommandExecute;

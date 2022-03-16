@@ -2,6 +2,7 @@ import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
 import Bot from "../../../bot";
 import { IGuildCache } from "../../../structure";
+import { ICommandExecute } from "../../../structure.d";
 
 export default {
 	data: new SlashCommandBuilder()
@@ -15,6 +16,7 @@ export default {
 				.addChoice("to english", "english")
 				.addChoice("to japonese", "japonese")
 		),
+	scope: "public",
 
 	async execute(interaction: CommandInteraction, guildCached: IGuildCache, bot: Bot) {
 		if (!interaction.options.data[0]) {
@@ -22,9 +24,9 @@ export default {
 			return;
 		}
 		const newLanguage = interaction.options.data[0].value as string;
-		await bot.API.updateGuild(guildCached.id, { language: newLanguage });
+		await bot.API.guilds.update(guildCached.id, { language: newLanguage });
 		guildCached.language = newLanguage;
 		await bot.cache.set(guildCached.id, guildCached, 60000);
 		interaction.reply(guildCached.language);
 	},
-};
+} as ICommandExecute;

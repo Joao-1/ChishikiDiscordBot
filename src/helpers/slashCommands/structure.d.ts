@@ -4,8 +4,8 @@ import { ICommandExecute } from "../../structure";
 
 export interface SlashCommandsRest {
 	deploy(
-		commands: Collection<string, ICommandExecute>,
-		specificGuildId?: string | undefined
-	): Promise<ApplicationCommand[] | undefined>;
+		command: Collection<string, ICommandExecute>,
+		specificsGuildsIds?: string[] | undefined
+	): Promise<ApplicationCommand<{}> | ApplicationCommand<{}>[]>;
 	delete(commandNameToDelete: string, guildId?: string): Promise<void>;
 }

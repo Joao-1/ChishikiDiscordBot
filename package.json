@@ -7,8 +7,8 @@
 	"scripts": {
 		"build": "tsc",
 		"prestart": "yarn build",
-		"start": "set NODE_ENV=production & node dist/index.js",
-		"dev": "dotenv -e .env.dev -- ts-node-dev ./src/start --ignore-watch node_modules index.ts"
+		"start": "NODE_ENV=prod & node dist/index.js",
+		"dev": "NODE_ENV=dev dotenv -e .env.dev -- ts-node-dev ./src/start --ignore-watch node_modules index.ts"
 	},
 	"dependencies": {
 		"@discordjs/builders": "^0.5.0",

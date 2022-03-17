@@ -3,7 +3,7 @@ import { BaseCommandInteraction, MessageEmbed } from "discord.js";
 import { ICommandExecute } from "../../../structure";
 
 export default {
-	data: new SlashCommandBuilder().setName("a").setDescription("gura"),
+	data: new SlashCommandBuilder().setName("a").setDescription("a"),
 	scope: "private",
 	async execute(interaction: BaseCommandInteraction) {
 		const newEmbed = new MessageEmbed()

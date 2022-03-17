@@ -5,8 +5,7 @@ import logger from "../logs/logger";
 import { IBotAPI } from "./APIs/chishikiAPI/structure";
 import Cache from "./cache/redis";
 import { SlashCommandsRest } from "./helpers/slashCommands/structure";
-import { IDiscordConfig, IGuild } from "./structure";
-import { ICommandExecute } from "./structure.d";
+import { ICommandExecute, IDiscordConfig, IGuild } from "./structure";
 
 export default class Bot extends Client {
 	public commands: Collection<string, ICommandExecute> = new Collection();
@@ -57,6 +56,11 @@ export default class Bot extends Client {
 	}
 
 	async deployCommands(discordServerDefault: string) {
+		if (process.env.NODE_ENV === "dev") {
+			await this.slashCommands.deploy(this.commands, [discordServerDefault]);
+			return;
+		}
+
 		const publicCommands = this.commands.filter(({ scope }) => scope === "public");
 		const privateCommands = this.commands.filter(({ scope }) => scope === "private" || scope === "custom");
 

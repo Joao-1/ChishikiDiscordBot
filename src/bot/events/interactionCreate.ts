@@ -1,6 +1,6 @@
 import { CommandInteraction } from "discord.js";
 import logger from "../../../logs/logger";
-import Bot from "../../bot";
+import Bot from "../../chishiki";
 
 export default {
 	name: "interactionCreate",

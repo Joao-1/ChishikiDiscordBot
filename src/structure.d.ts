@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction, Message } from "discord.js";
-import Bot from "./bot";
+import Bot from "./chishiki";
 
 // export type If<T extends boolean, A, B = null> = T extends true ? A : T extends false ? B : A | B;
 export interface IDiscordConfig {

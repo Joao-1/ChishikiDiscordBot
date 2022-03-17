@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
-import Bot from "../../../bot";
+import Bot from "../../../chishiki";
 import { IGuildCache } from "../../../structure";
 import { ICommandExecute } from "../../../structure.d";
 

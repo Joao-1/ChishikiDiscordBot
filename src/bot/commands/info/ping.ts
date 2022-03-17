@@ -1,10 +1,10 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { BaseCommandInteraction, MessageEmbed } from "discord.js";
-import Bot from "../../../bot";
+import Bot from "../../../chishiki";
 import { ICommandExecute } from "../../../structure";
 
 export default {
-	data: new SlashCommandBuilder().setName("pong").setDescription("Replies with pong?"),
+	data: new SlashCommandBuilder().setName("ping").setDescription("replies with your Discord ping!"),
 	scope: "public",
 	async execute(interaction: BaseCommandInteraction, _guildCache, bot: Bot) {
 		const newEmbed = new MessageEmbed()

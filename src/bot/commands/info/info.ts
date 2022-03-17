@@ -7,7 +7,7 @@ export default {
 		.setName("info")
 		.setDescription("Get info about a user or a server!!")
 		.addStringOption((option) => option.setName(`teste`).setDescription(`apenas um teste`)),
-	scope: "private",
+	scope: "public",
 
 	async execute(interaction: BaseCommandInteraction) {
 		await interaction.reply("info!");

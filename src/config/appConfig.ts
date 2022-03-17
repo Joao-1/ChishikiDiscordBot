@@ -1,0 +1,3 @@
+export default {
+	DISCORD_SERVER_DEFAULT_ID: process.env.DISCORD_SERVER_DEFAULT_ID,
+};

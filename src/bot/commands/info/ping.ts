@@ -4,7 +4,7 @@ import Bot from "../../../bot";
 import { ICommandExecute } from "../../../structure";
 
 export default {
-	data: new SlashCommandBuilder().setName("ping").setDescription("Replies with pong?"),
+	data: new SlashCommandBuilder().setName("pong").setDescription("Replies with pong?"),
 	scope: "public",
 	async execute(interaction: BaseCommandInteraction, _guildCache, bot: Bot) {
 		const newEmbed = new MessageEmbed()

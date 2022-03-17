@@ -7,12 +7,12 @@ export default {
 	once: false,
 	async execute(interaction: CommandInteraction, bot: Bot) {
 		if (!interaction.isCommand()) return;
-		if (!interaction.guild?.id) return;
-		let guildCached = await bot.cache.get(interaction.guild?.id);
+		if (!interaction.guildId) return;
+		let guildCached = await bot.cache.get(interaction.guildId);
 
 		if (!guildCached) {
 			try {
-				guildCached = await bot.registerNewGuildInSystem(interaction.guild.id);
+				guildCached = await bot.registerNewGuildInSystem(interaction.guildId);
 				if (!guildCached) throw new Error("Error retrieving guild data");
 			} catch (error) {
 				logger.error(error);

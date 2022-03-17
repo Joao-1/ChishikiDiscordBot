@@ -1,4 +1,5 @@
 import Redis from "ioredis";
+import config from "../config";
 import { IGuildCache } from "../structure";
 
 class RedisInstance {
@@ -6,8 +7,8 @@ class RedisInstance {
 
 	constructor() {
 		this.client = new Redis({
-			port: 6379,
-			host: "127.0.0.1",
+			port: config.cache.PORT,
+			host: config.cache.HOST,
 		});
 	}
 
@@ -17,11 +18,11 @@ class RedisInstance {
 		return guildFromCache ? (JSON.parse(guildFromCache) as IGuildCache) : null;
 	}
 
-	set(key: string, value: any, timeExp: number): Promise<string | null> {
+	async set(key: string, value: any, timeExp: number): Promise<string | null> {
 		return this.client.set(key, JSON.stringify(value), "EX", timeExp);
 	}
 
-	del(key: string): Promise<number> {
+	async del(key: string): Promise<number> {
 		return this.client.del(key);
 	}
 

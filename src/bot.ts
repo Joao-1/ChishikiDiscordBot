@@ -5,7 +5,7 @@ import logger from "../logs/logger";
 import { IBotAPI } from "./APIs/chishikiAPI/structure";
 import Cache from "./cache/redis";
 import { SlashCommandsRest } from "./helpers/slashCommands/structure";
-import { ICommandAPI, IConfig, IGuild } from "./structure";
+import { IDiscordConfig, IGuild } from "./structure";
 import { ICommandExecute } from "./structure.d";
 
 export default class Bot extends Client {
@@ -20,13 +20,12 @@ export default class Bot extends Client {
 		super(clientOptions);
 	}
 
-	async start({ token, discordServerDefault }: IConfig) {
+	async start({ TOKEN, DISCORD_SERVER_DEFAULT_ID }: IDiscordConfig) {
 		try {
 			await this.loadEvents();
 			await this.loadCommands();
-			await this.deployCommands(discordServerDefault);
-			await this.syncCommands();
-			await this.login(token);
+			await this.deployCommands(DISCORD_SERVER_DEFAULT_ID);
+			await this.login(TOKEN);
 			await this.syncGuilds();
 		} catch (error) {
 			console.log(error);
@@ -77,25 +76,6 @@ export default class Bot extends Client {
 
 		allGuildsInAPI.forEach((guild) => {
 			this.cache.set(guild.id, guild, 60000);
-		});
-	}
-
-	async syncCommands() {
-		const allCommandsInAPI: ICommandAPI[] = await this.API.commands.get();
-		this.commands.forEach(async (commandInBot) => {
-			if (!allCommandsInAPI.some((commandInAPI) => commandInAPI.name === commandInBot.data.name)) {
-				const newCommands = await this.API.commands.register(
-					commandInBot.data.name,
-					commandInBot.data.description,
-					commandInBot.scope
-				);
-
-				allCommandsInAPI.push(newCommands);
-			}
-		});
-
-		allCommandsInAPI.forEach((command) => {
-			this.cache.set(command.name, command, 60000);
 		});
 	}
 

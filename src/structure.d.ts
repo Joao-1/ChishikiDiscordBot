@@ -4,10 +4,10 @@ import { CommandInteraction, Message } from "discord.js";
 import Bot from "./bot";
 
 // export type If<T extends boolean, A, B = null> = T extends true ? A : T extends false ? B : A | B;
-export interface IConfig {
-	clientId: string;
-	token: string;
-	discordServerDefault: string;
+export interface IDiscordConfig {
+	CLIENT_ID: string;
+	TOKEN: string;
+	DISCORD_SERVER_DEFAULT_ID: string;
 }
 
 export interface IGuild {

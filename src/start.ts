@@ -4,24 +4,25 @@ import ChishikiAPI from "./APIs/chishikiAPI/chishikiAPi";
 import DiscordRoutesAPI from "./APIs/DiscordRoutesAPI/discordRoutesAPI";
 import Bot from "./bot";
 import Redis from "./cache/redis";
-import config from "./config/config";
+import config from "./config";
 import SlashCommands from "./helpers/slashCommands/slashCommandsInAGuild";
 
-const { clientId, token, intents, discordServerDefault } = config;
+const { app, apis } = config;
+const { DISCORD_SERVER_DEFAULT_ID } = app;
+const { TOKEN, CLIENT_ID, INTENTS } = apis.DISCORD_API;
 
-if (!token || !clientId) throw new Error("Missing Token or ClientId");
-if (!discordServerDefault) throw new Error("Missing Discord Default Server");
+if (!TOKEN || !CLIENT_ID || !INTENTS || !DISCORD_SERVER_DEFAULT_ID) throw new Error("Env file is missing some value");
 
 const chishikiAPI = new ChishikiAPI();
 const redisCache = new Redis();
 const discordRoutesAPI = new DiscordRoutesAPI();
-const slashCommands = new SlashCommands(clientId, discordRoutesAPI, token);
+const slashCommands = new SlashCommands(CLIENT_ID, discordRoutesAPI, TOKEN);
 
-const bot = new Bot(intents, chishikiAPI, redisCache, slashCommands);
+const bot = new Bot(INTENTS, chishikiAPI, redisCache, slashCommands);
 
 (async () => {
 	await axios
-		.get(`${config.apiURL}/ping`)
+		.get(`${apis.CHISHIKI_API.URL}/ping`)
 		.then((response) => {
 			if (response.status !== 200) throw new Error("Could not connect with API");
 			logger.log({ level: "info", message: "Successfully connected to API" });
@@ -31,7 +32,7 @@ const bot = new Bot(intents, chishikiAPI, redisCache, slashCommands);
 			process.exit();
 		});
 
-	await bot.start({ clientId, token, discordServerDefault });
+	await bot.start({ CLIENT_ID, TOKEN, DISCORD_SERVER_DEFAULT_ID });
 })();
 
 export default bot;

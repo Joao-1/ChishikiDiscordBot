@@ -17,7 +17,6 @@ export default class SlashCommands implements SlashCommandsRest {
 
 	async deploy(command: Collection<string, ICommandExecute>, specificsGuildsIds?: string[]) {
 		const commandJson = transformCommandsToJson(command) as { name: string; description: string }[];
-
 		if (specificsGuildsIds) {
 			const commandRegistred = {} as ApplicationCommand;
 			for (const guildId of specificsGuildsIds) {

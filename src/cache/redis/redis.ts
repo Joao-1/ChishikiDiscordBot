@@ -6,10 +6,7 @@ class RedisInstance {
 	readonly client: Redis.Redis;
 
 	constructor() {
-		this.client = new Redis({
-			port: config.cache.PORT,
-			host: config.cache.HOST,
-		});
+		this.client = new Redis({ port: config.cache.PORT, host: config.cache.HOST });
 	}
 
 	async get(key: string): Promise<IGuildCache | null> {

@@ -2,7 +2,7 @@ import axios from "axios";
 import logger from "../logs/logger";
 import ChishikiAPI from "./APIs/chishikiAPI/chishikiAPi";
 import DiscordRoutesAPI from "./APIs/DiscordRoutesAPI/discordRoutesAPI";
-import Redis from "./cache/redis";
+import Redis from "./cache/redis/redis";
 import Bot from "./chishiki";
 import config from "./config";
 import SlashCommands from "./helpers/slashCommands/slashCommandsInAGuild";

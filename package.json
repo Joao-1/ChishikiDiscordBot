@@ -7,7 +7,7 @@
 	"scripts": {
 		"build": "tsc",
 		"prestart": "yarn build",
-		"start": "NODE_ENV=prod & node dist/index.js",
+		"start": "NODE_ENV=prod & node dist/start.js",
 		"dev": "NODE_ENV=dev dotenv -e .env.dev -- ts-node-dev ./src/start --ignore-watch node_modules index.ts"
 	},
 	"dependencies": {

@@ -3,11 +3,11 @@ import glob from "glob";
 import { promisify } from "util";
 import logger from "../logs/logger";
 import { IBotAPI } from "./APIs/chishikiAPI/structure";
-import Cache from "./cache/redis";
+import Cache from "./cache/redis/redis";
 import { SlashCommandsRest } from "./helpers/slashCommands/structure";
 import { ICommandExecute, IDiscordConfig, IGuild } from "./structure";
 
-export default class Bot extends Client {
+export default class ChishikiBot extends Client {
 	public commands: Collection<string, ICommandExecute> = new Collection();
 
 	constructor(
@@ -33,15 +33,6 @@ export default class Bot extends Client {
 		}
 	}
 
-	async loadCommands() {
-		const commandFiles: string[] = await promisify(glob)(`${__dirname}/bot/commands/**/*{.ts,.js}`);
-
-		commandFiles.forEach(async (pathToCommand: string) => {
-			const command: ICommandExecute = require(pathToCommand).default;
-			this.commands.set(command.data.name, command);
-		});
-	}
-
 	async loadEvents() {
 		const eventFiles: string[] = await promisify(glob)(`${__dirname}/bot/events/**/*{.ts,.js}`);
 
@@ -52,6 +43,15 @@ export default class Bot extends Client {
 			} else {
 				this.on(event.name, (...args) => event.execute(...args, this));
 			}
+		});
+	}
+
+	async loadCommands() {
+		const commandFiles: string[] = await promisify(glob)(`${__dirname}/bot/commands/**/*{.ts,.js}`);
+
+		commandFiles.forEach(async (pathToCommand: string) => {
+			const command: ICommandExecute = require(pathToCommand).default;
+			this.commands.set(command.data.name, command);
 		});
 	}
 
@@ -79,13 +79,13 @@ export default class Bot extends Client {
 		});
 
 		allGuildsInAPI.forEach((guild) => {
-			this.cache.set(guild.id, guild, 60000);
+			this.cache.set(guild.id, guild, 60_000);
 		});
 	}
 
 	async registerNewGuildInSystem(guildId: string) {
 		const newGuild = await this.API.guilds.register(guildId);
-		await this.cache.set(guildId, newGuild, 60000);
+		await this.cache.set(guildId, newGuild, 60_000);
 		return this.cache.get(guildId);
 	}
 }

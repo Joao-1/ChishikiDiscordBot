@@ -1,6 +1,6 @@
 import Redis from "ioredis";
-import config from "../config";
-import { IGuildCache } from "../structure";
+import config from "../../config";
+import { IGuildCache } from "../../structure";
 
 class RedisInstance {
 	readonly client: Redis.Redis;

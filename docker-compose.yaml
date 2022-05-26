@@ -1,0 +1,27 @@
+version: "3"
+
+services:
+    app:
+        build: .
+        container_name: chishikibot
+        environment:
+          - CLIENT_ID=${CLIENT_ID}
+          - BOT_TOKEN=${BOT_TOKEN}
+          - CACHE_HOST=${CACHE_HOST}
+          - CACHE_PORT=${CACHE_PORT}
+          - CACHE_PASSWORD=${CACHE_PASSWORD}
+          - CHISHIKI_API_URL=${CHISHIKI_API_URL}
+        depends_on:
+            - cache
+        volumes:
+            - .:/usr/app
+            - /usr/app/node_modules
+
+    cache:
+        image: redis
+        container_name: redisbot
+        restart: always
+        ports:
+            - ${CACHE_PORT}:${CACHE_PORT}
+        volumes:
+            - ./src/cache/redis/redis.conf:/usr/local/etc/redis/redis.conf

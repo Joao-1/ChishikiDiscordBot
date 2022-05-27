@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction, Message } from "discord.js";
+import { TFunction } from "i18next";
 import Bot from "./chishiki";
-
 // export type If<T extends boolean, A, B = null> = T extends true ? A : T extends false ? B : A | B;
 export interface IDiscordConfig {
 	CLIENT_ID: string;
@@ -33,5 +33,10 @@ export interface ICommandAPI {
 export interface ICommandExecute {
 	data: SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
 	scope: "public" | "private" | "custom";
-	execute(interaction: CommandInteraction | Message, guildCached: IGuild, bot: Bot): void;
+	execute(props: {
+		interaction: CommandInteraction | Message;
+		guildCached: IGuild;
+		bot: Bot;
+		locale: TFunction;
+	}): void;
 }

@@ -17,6 +17,8 @@
 		"discord-api-types": "0.20.2",
 		"discord.js": "^13.1.0",
 		"glob": "^7.1.7",
+		"i18next": "^21.8.4",
+		"i18next-fs-backend": "^1.1.4",
 		"ioredis": "^4.28.5",
 		"lodash": "^4.17.21",
 		"redis": "^4.0.4",
@@ -25,6 +27,7 @@
 	},
 	"devDependencies": {
 		"@types/glob": "^7.1.4",
+		"@types/i18next-fs-backend": "^1.1.2",
 		"@types/ioredis": "^4.27.2",
 		"@types/lodash": "^4.14.180",
 		"@types/node": "^15.12.4",

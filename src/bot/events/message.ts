@@ -1,4 +1,5 @@
 import { Message } from "discord.js";
+import i18next from "i18next";
 import logger from "../../../logs/logger";
 import Bot from "../../chishiki";
 
@@ -25,6 +26,7 @@ export default {
 
 		const { prefix } = guildCached;
 
+		const locale = i18next.getFixedT(guildCached.language || "pt-BR");
 		if (!message.content.toLocaleLowerCase().startsWith(prefix)) return;
 		const messageContent: string[] = message.content.slice(prefix.length).trim().split(/ +/g);
 		const typedCommand = messageContent.shift();
@@ -37,7 +39,7 @@ export default {
 		// 	return;
 		// }
 		try {
-			commandFromBot.execute(message, guildCached, bot);
+			commandFromBot.execute({ interaction: message, guildCached, bot, locale });
 		} catch (error) {
 			logger.error(error);
 		}

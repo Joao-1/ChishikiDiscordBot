@@ -1,5 +1,9 @@
+/* eslint-disable no-console */
 import { Client, ClientOptions, Collection } from "discord.js";
+import * as fs from "fs";
 import glob from "glob";
+import i18next from "i18next";
+import i18nbackend from "i18next-fs-backend";
 import { promisify } from "util";
 import logger from "../logs/logger";
 import { IBotAPI } from "./APIs/chishikiAPI/structure";
@@ -23,11 +27,11 @@ export default class ChishikiBot extends Client {
 		try {
 			await this.loadEvents();
 			await this.loadCommands();
+			await this.loadLocales(`${__dirname}/locales`);
 			await this.deployCommands(DISCORD_SERVER_DEFAULT_ID);
 			await this.login(TOKEN);
 			await this.syncGuilds();
 		} catch (error) {
-			console.log(error);
 			logger.error(error);
 			process.exit();
 		}
@@ -53,6 +57,27 @@ export default class ChishikiBot extends Client {
 			const command: ICommandExecute = require(pathToCommand).default;
 			this.commands.set(command.data.name, command);
 		});
+	}
+
+	async loadLocales(path: string): Promise<void> {
+		try {
+			await i18next.use(i18nbackend).init({
+				ns: ["commands", "events"],
+				defaultNS: "commands",
+				preload: fs.readdirSync(path),
+				fallbackLng: "pt-BR",
+				backend: { loadPath: `${path}/{{lng}}/{{ns}}.json` },
+				interpolation: {
+					escapeValue: false,
+					useRawValueToEscape: true,
+				},
+				returnEmptyString: false,
+				returnObjects: true,
+			});
+			return console.info(`[LOCALES] - Carregados ${i18next.languages.length} locales`);
+		} catch (error) {
+			return console.error(`Erro ao carregar locales: `, error);
+		}
 	}
 
 	async deployCommands(discordServerDefault: string) {

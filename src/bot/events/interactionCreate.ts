@@ -1,4 +1,5 @@
 import { CommandInteraction } from "discord.js";
+import i18next from "i18next";
 import logger from "../../../logs/logger";
 import Bot from "../../chishiki";
 
@@ -20,11 +21,12 @@ export default {
 			}
 		}
 
+		const locale = i18next.getFixedT(guildCached.language || "pt-BR");
 		const command = bot.commands.get(interaction.commandName);
 		if (!command) return;
 
 		try {
-			command.execute(interaction, guildCached, bot);
+			command.execute({ interaction, guildCached, bot, locale });
 		} catch (error) {
 			logger.error(error);
 		}

@@ -3,7 +3,7 @@ import { Routes } from "discord-api-types/rest/v9";
 import { ApplicationCommand, Collection } from "discord.js";
 import logger from "../../../logs/logger";
 import { IDiscordRoutesAPI } from "../../APIs/DiscordRoutesAPI/structure.d";
-import { ICommandExecute } from "../../structure";
+import { ICommand } from "../../structure";
 import transformCommandsToJson from "../../utils/transformCommandsToJson";
 import { SlashCommandsRest } from "./structure";
 
@@ -15,7 +15,7 @@ export default class SlashCommands implements SlashCommandsRest {
 		this.restMethods = this.restMethods.setToken(token);
 	}
 
-	async deploy(command: Collection<string, ICommandExecute>, specificsGuildsIds?: string[]) {
+	async deploy(command: Collection<string, ICommand>, specificsGuildsIds?: string[]) {
 		const commandJson = transformCommandsToJson(command) as { name: string; description: string }[];
 		if (specificsGuildsIds) {
 			const commandRegistred = {} as ApplicationCommand;

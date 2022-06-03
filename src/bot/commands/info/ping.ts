@@ -1,15 +1,22 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageEmbed } from "discord.js";
-import { ICommandExecute } from "../../../structure";
+import { CommandInteraction, Message, MessageEmbed } from "discord.js";
+import ChishikiClient from "../../../chishiki";
+import { ICommand } from "../../../structure";
 
-export default {
-	data: new SlashCommandBuilder().setName("ping").setDescription("replies with your Discord ping!"),
-	scope: "public",
-	async execute({ interaction, bot }) {
+export default class PingCommand implements ICommand {
+	client: ChishikiClient;
+	scope = "public" as const;
+	data = new SlashCommandBuilder().setName("ping").setDescription("replies with your Discord ping!");
+
+	constructor(client: ChishikiClient) {
+		this.client = client;
+	}
+
+	async execute(interaction: CommandInteraction | Message) {
 		const newEmbed = new MessageEmbed()
 			.setColor("BLUE")
 			.setTitle("Pong!")
-			.setFields({ name: "ping:", value: `${bot.ws.ping}ms` });
+			.setFields({ name: "ping:", value: `${this.client.ws.ping}ms` });
 		await interaction.reply({ embeds: [newEmbed] });
-	},
-} as ICommandExecute;
+	}
+}

@@ -2,7 +2,7 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction, Message } from "discord.js";
 import { TFunction } from "i18next";
-import Bot from "./chishiki";
+import ChishikiClient from "./chishiki";
 // export type If<T extends boolean, A, B = null> = T extends true ? A : T extends false ? B : A | B;
 export interface IDiscordConfig {
 	CLIENT_ID: string;
@@ -30,13 +30,18 @@ export interface ICommandAPI {
 	scope: "public" | "private" | "custom";
 }
 
-export interface ICommandExecute {
+export interface ICommand {
+	client: ChishikiClient;
 	data: SlashCommandBuilder | Omit<SlashCommandBuilder, "addSubcommand" | "addSubcommandGroup">;
 	scope: "public" | "private" | "custom";
-	execute(props: {
-		interaction: CommandInteraction | Message;
-		guildCached: IGuild;
-		bot: Bot;
-		locale: TFunction;
-	}): void;
+
+	execute(interaction: CommandInteraction | Message, locale: TFunction, guildCached: IGuild): Promise<void>;
+}
+
+export interface IEvent {
+	client: ChishikiClient;
+	name: string;
+	once: boolean;
+
+	execute(interaction?: CommandInteraction | Message): Promise<void>;
 }

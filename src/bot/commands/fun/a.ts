@@ -1,15 +1,22 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { MessageEmbed } from "discord.js";
-import { ICommandExecute } from "../../../structure";
+import { CommandInteraction, Message, MessageEmbed } from "discord.js";
+import ChishikiClient from "../../../chishiki";
+import { ICommand } from "../../../structure";
 
-export default {
-	data: new SlashCommandBuilder().setName("a").setDescription("a"),
-	scope: "private",
-	async execute({ interaction }) {
+export default class ACommand implements ICommand {
+	client: ChishikiClient;
+	scope = "private" as const;
+	data = new SlashCommandBuilder().setName("a").setDescription("a");
+
+	constructor(client: ChishikiClient) {
+		this.client = client;
+	}
+
+	async execute(interaction: CommandInteraction | Message) {
 		const newEmbed = new MessageEmbed()
 			.setColor("BLUE")
 			.setTitle("A")
 			.setImage("https://i.ytimg.com/vi/vKGm6diTM34/maxresdefault.jpg");
 		await interaction.reply({ embeds: [newEmbed] });
-	},
-} as ICommandExecute;
+	}
+}

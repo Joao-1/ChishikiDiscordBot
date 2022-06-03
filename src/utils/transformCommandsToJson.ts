@@ -1,10 +1,10 @@
 import { Collection } from "discord.js";
-import { ICommandExecute } from "../structure";
+import { ICommand } from "../structure";
 
-export = (commands: Collection<string, ICommandExecute>) => {
+export = (commands: Collection<string, ICommand>) => {
 	const commandsToDeploy: unknown[] = [];
 
-	commands.forEach((command: ICommandExecute) => {
+	commands.forEach((command: ICommand) => {
 		commandsToDeploy.push(command.data.toJSON());
 	});
 

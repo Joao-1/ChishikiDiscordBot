@@ -1,22 +1,29 @@
 import { Message } from "discord.js";
 import i18next from "i18next";
 import logger from "../../../logs/logger";
-import Bot from "../../chishiki";
+import ChishikiClient from "../../chishiki";
+import { IEvent } from "../../structure";
 
-export default {
-	name: "messageCreate",
-	once: false,
-	async execute(message: Message, bot: Bot) {
+export default class MessageCreateEvent implements IEvent {
+	client: ChishikiClient;
+	name = "messageCreate";
+	once = false;
+
+	constructor(client: ChishikiClient) {
+		this.client = client;
+	}
+
+	async execute(message: Message) {
 		if (message.author.bot) return;
 		if (message.channel.type === "DM") return;
 
 		if (!message.guildId) return;
 
-		let guildCached = await bot.cache.get(message.guildId);
+		let guildCached = await this.client.cache.get(message.guildId);
 
 		if (!guildCached) {
 			try {
-				guildCached = await bot.registerNewGuildInSystem(message.guildId);
+				guildCached = await this.client.registerNewGuildInSystem(message.guildId);
 				if (!guildCached) throw new Error("Error retrieving guild data");
 			} catch (error) {
 				logger.error(error);
@@ -32,16 +39,16 @@ export default {
 		const typedCommand = messageContent.shift();
 		if (!typedCommand) return;
 
-		const commandFromBot = bot.commands.get(typedCommand);
+		const commandFromBot = this.client.commands.get(typedCommand);
 		if (!commandFromBot) return;
 		// if (!commandFromBot.allowedServers?.includes(message.guild.id)) {
 		// 	message.reply("sem permissão!");
 		// 	return;
 		// }
 		try {
-			commandFromBot.execute({ interaction: message, guildCached, bot, locale });
+			commandFromBot.execute(message, locale, guildCached);
 		} catch (error) {
 			logger.error(error);
 		}
-	},
-};
+	}
+}

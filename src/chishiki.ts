@@ -9,10 +9,10 @@ import logger from "../logs/logger";
 import { IBotAPI } from "./APIs/chishikiAPI/structure";
 import Cache from "./cache/redis/redis";
 import { SlashCommandsRest } from "./helpers/slashCommands/structure";
-import { ICommandExecute, IDiscordConfig, IGuild } from "./structure";
+import { ICommand, IDiscordConfig, IEvent, IGuild } from "./structure";
 
-export default class ChishikiBot extends Client {
-	public commands: Collection<string, ICommandExecute> = new Collection();
+export default class ChishikiClient extends Client {
+	public commands: Collection<string, ICommand> = new Collection();
 
 	constructor(
 		clientOptions: ClientOptions /* eslint-disable no-unused-vars */,
@@ -40,9 +40,10 @@ export default class ChishikiBot extends Client {
 	async loadEvents() {
 		const eventFiles: string[] = await promisify(glob)(`${__dirname}/bot/events/**/*{.ts,.js}`);
 
-		eventFiles.forEach(async (value: string) => {
-			const event = require(value).default;
-			if (event.once === "true") {
+		eventFiles.forEach(async (path: string) => {
+			const EventFile = (await import(path)).default;
+			const event: IEvent = new EventFile(this);
+			if (event.once === true) {
 				this.once(event.name, (...args) => event.execute(...args, this));
 			} else {
 				this.on(event.name, (...args) => event.execute(...args, this));
@@ -54,7 +55,8 @@ export default class ChishikiBot extends Client {
 		const commandFiles: string[] = await promisify(glob)(`${__dirname}/bot/commands/**/*{.ts,.js}`);
 
 		commandFiles.forEach(async (pathToCommand: string) => {
-			const command: ICommandExecute = require(pathToCommand).default;
+			const CommandFile = (await import(pathToCommand)).default;
+			const command: ICommand = new CommandFile(this);
 			this.commands.set(command.data.name, command);
 		});
 	}

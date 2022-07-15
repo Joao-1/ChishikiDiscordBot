@@ -8,8 +8,8 @@ import { promisify } from "util";
 import logger from "../logs/logger";
 import { IBotAPI } from "./APIs/chishikiAPI/structure";
 import Cache from "./cache/redis/redis";
-import { SlashCommandsRest } from "./helpers/slashCommands/structure";
-import { ICommand, IDiscordConfig, IEvent, IGuild } from "./structure";
+import { ISlashCommandsRest } from "./helpers/slashCommands/structure";
+import { ICommand, IDiscordConfig, IEvent, IGuild, IGuildCache } from "./structure";
 
 export default class ChishikiClient extends Client {
 	public commands: Collection<string, ICommand> = new Collection();
@@ -18,12 +18,12 @@ export default class ChishikiClient extends Client {
 		clientOptions: ClientOptions /* eslint-disable no-unused-vars */,
 		readonly API: IBotAPI,
 		readonly cache: Cache,
-		readonly slashCommands: SlashCommandsRest /* eslint-enable no-unused-vars */
+		readonly slashCommands: ISlashCommandsRest /* eslint-enable no-unused-vars */
 	) {
 		super(clientOptions);
 	}
 
-	async start({ TOKEN, DISCORD_SERVER_DEFAULT_ID }: IDiscordConfig) {
+	async start({ TOKEN, DISCORD_SERVER_DEFAULT_ID }: IDiscordConfig): Promise<void> {
 		try {
 			await this.loadEvents();
 			await this.loadCommands();
@@ -37,7 +37,7 @@ export default class ChishikiClient extends Client {
 		}
 	}
 
-	async loadEvents() {
+	async loadEvents(): Promise<void> {
 		const eventFiles: string[] = await promisify(glob)(`${__dirname}/bot/events/**/*{.ts,.js}`);
 
 		eventFiles.forEach(async (path: string) => {
@@ -51,7 +51,7 @@ export default class ChishikiClient extends Client {
 		});
 	}
 
-	async loadCommands() {
+	async loadCommands(): Promise<void> {
 		const commandFiles: string[] = await promisify(glob)(`${__dirname}/bot/commands/**/*{.ts,.js}`);
 
 		commandFiles.forEach(async (pathToCommand: string) => {
@@ -82,9 +82,10 @@ export default class ChishikiClient extends Client {
 		}
 	}
 
-	async deployCommands(discordServerDefault: string) {
+	async deployCommands(discordServerDefault: string): Promise<void> {
 		if (process.env.NODE_ENV === "dev") {
-			await this.slashCommands.deploy(this.commands, [discordServerDefault]);
+			const test = await this.slashCommands.deploy(this.commands, [discordServerDefault]);
+			console.log(test);
 			return;
 		}
 
@@ -95,7 +96,7 @@ export default class ChishikiClient extends Client {
 		await this.slashCommands.deploy(privateCommands, [discordServerDefault]);
 	}
 
-	async syncGuilds() {
+	async syncGuilds(): Promise<void> {
 		const allGuildsInAPI: IGuild[] = await this.API.guilds.getAll();
 
 		this.guilds.cache.forEach(async (guildInDiscord) => {
@@ -110,7 +111,7 @@ export default class ChishikiClient extends Client {
 		});
 	}
 
-	async registerNewGuildInSystem(guildId: string) {
+	async registerNewGuildInSystem(guildId: string): Promise<IGuildCache | null> {
 		const newGuild = await this.API.guilds.register(guildId);
 		await this.cache.set(guildId, newGuild, 60_000);
 		return this.cache.get(guildId);

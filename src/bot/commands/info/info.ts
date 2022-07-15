@@ -6,8 +6,8 @@ import { ICommand } from "../../../structure";
 
 export default class InfoCommand implements ICommand {
 	client: ChishikiClient;
-	scope = "public" as const;
 	data = new SlashCommandBuilder().setName("info").setDescription("Get info about a user or a server!!");
+	scope: "public" | "private" | "custom" = "public";
 
 	constructor(client: ChishikiClient) {
 		this.client = client;

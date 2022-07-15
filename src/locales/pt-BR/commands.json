@@ -1,5 +1,8 @@
 { 
     "info": { 
         "message": "info"
+    },
+    "language": {
+        "languageNotProvided": "Preciso saber a linguagem que você deseja que eu fale."
     }
 }

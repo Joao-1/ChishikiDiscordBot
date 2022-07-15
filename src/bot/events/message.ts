@@ -22,29 +22,23 @@ export default class MessageCreateEvent implements IEvent {
 		let guildCached = await this.client.cache.get(message.guildId);
 
 		if (!guildCached) {
-			try {
-				guildCached = await this.client.registerNewGuildInSystem(message.guildId);
-				if (!guildCached) throw new Error("Error retrieving guild data");
-			} catch (error) {
-				logger.error(error);
-				return;
-			}
+			guildCached = await this.client.registerNewGuildInSystem(message.guildId);
+			if (!guildCached) throw new Error("Error retrieving guild data");
 		}
 
-		const { prefix } = guildCached;
+		const { prefix, language } = guildCached;
 
-		const locale = i18next.getFixedT(guildCached.language || "pt-BR");
 		if (!message.content.toLocaleLowerCase().startsWith(prefix)) return;
+
 		const messageContent: string[] = message.content.slice(prefix.length).trim().split(/ +/g);
 		const typedCommand = messageContent.shift();
 		if (!typedCommand) return;
 
 		const commandFromBot = this.client.commands.get(typedCommand);
 		if (!commandFromBot) return;
-		// if (!commandFromBot.allowedServers?.includes(message.guild.id)) {
-		// 	message.reply("sem permissão!");
-		// 	return;
-		// }
+
+		const locale = i18next.getFixedT(language || "en-US");
+
 		try {
 			commandFromBot.execute(message, locale, guildCached);
 		} catch (error) {

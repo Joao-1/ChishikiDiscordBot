@@ -1,34 +1,35 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
-import { CommandInteraction, Message } from "discord.js";
+import { CommandInteraction } from "discord.js";
+import { TFunction } from "i18next";
 import ChishikiClient from "../../../chishiki";
-import { IGuild } from "../../../structure";
+import { ICommand, IGuild } from "../../../structure";
 
-export default class LanguageCommand {
+export default class LanguageCommand implements ICommand {
 	client: ChishikiClient;
-	scope = "public" as const;
 	data = new SlashCommandBuilder()
 		.setName("language")
-		.setDescription("Choose the language Chishiki will use on the server")
-		.addStringOption((option) =>
-			option
-				.setName("switch")
+		.setDescription("Choose the language Chishiki will use on this server")
+		.addStringOption((optionOne) =>
+			optionOne
+				.setName("server")
 				.setDescription("Choose the language Chishiki will speak on this server")
 				.addChoice("to portuguese", "portuguese")
 				.addChoice("to english", "english")
-				.addChoice("to japonese", "japonese")
 		);
+
+	scope: "public" | "private" | "custom" = "public";
 
 	constructor(client: ChishikiClient) {
 		this.client = client;
 	}
 
-	async execute(interaction: CommandInteraction | Message, guildCached: IGuild) {
-		if (!(interaction as CommandInteraction).options.data[0]) {
-			interaction.reply("Preciso saber a linguagem que você deseja que eu fale");
-			return;
+	async execute(interaction: CommandInteraction, locale: TFunction, guildCached: IGuild) {
+		if (!interaction.options.data[0]) {
+			interaction.reply(locale("commands:language.languageNotProvided"));
 		}
-		const newLanguage = (interaction as CommandInteraction).options.data[0].value as string;
-		await this.client.API.guilds.update(guildCached.id, { language: newLanguage });
+
+		const newLanguage = interaction.options.data[0].value as string;
+		// await this.client.API.guilds.update(guildCached.id, { language: newLanguage });
 		guildCached.language = newLanguage;
 		await this.client.cache.set(guildCached.id, guildCached, 60_000);
 		interaction.reply(guildCached.language);

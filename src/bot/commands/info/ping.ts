@@ -5,8 +5,8 @@ import { ICommand } from "../../../structure";
 
 export default class PingCommand implements ICommand {
 	client: ChishikiClient;
-	scope = "public" as const;
 	data = new SlashCommandBuilder().setName("ping").setDescription("replies with your Discord ping!");
+	scope: "public" | "private" | "custom" = "public";
 
 	constructor(client: ChishikiClient) {
 		this.client = client;

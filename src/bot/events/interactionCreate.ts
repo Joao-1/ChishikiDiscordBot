@@ -19,19 +19,14 @@ export default class interactionCreateEvent implements IEvent {
 		let guildCached = await this.client.cache.get(interaction.guildId);
 
 		if (!guildCached) {
-			try {
-				guildCached = await this.client.registerNewGuildInSystem(interaction.guildId);
-				if (!guildCached) throw new Error("Error retrieving guild data");
-			} catch (error) {
-				logger.error(error);
-				return;
-			}
+			guildCached = await this.client.registerNewGuildInSystem(interaction.guildId);
+			if (!guildCached) throw new Error("Error retrieving guild data");
 		}
-
-		const locale = i18next.getFixedT(guildCached.language || "pt-BR");
 
 		const command = this.client.commands.get(interaction.commandName);
 		if (!command) return;
+
+		const locale = i18next.getFixedT(guildCached.language || "en-US");
 
 		try {
 			command.execute(interaction, locale, guildCached);

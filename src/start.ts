@@ -9,7 +9,6 @@ import SlashCommands from "./helpers/slashCommands/slashCommandsInAGuild";
 const { app, apis } = config;
 const { DISCORD_SERVER_DEFAULT_ID } = app;
 const { TOKEN, CLIENT_ID, INTENTS } = apis.DISCORD_API;
-
 if (!TOKEN || !CLIENT_ID || !INTENTS || !DISCORD_SERVER_DEFAULT_ID)
 	throw new Error(`Env file is missing some value, ${apis.DISCORD_API}`);
 

@@ -5,9 +5,9 @@ import logger from "../../../logs/logger";
 import { IDiscordRoutesAPI } from "../../APIs/DiscordRoutesAPI/structure.d";
 import { ICommand } from "../../structure";
 import transformCommandsToJson from "../../utils/transformCommandsToJson";
-import { SlashCommandsRest } from "./structure";
+import { ISlashCommandsRest } from "./structure";
 
-export default class SlashCommands implements SlashCommandsRest {
+export default class SlashCommands implements ISlashCommandsRest {
 	private restMethods: REST = new REST({ version: "9" });
 
 	// eslint-disable-next-line no-unused-vars

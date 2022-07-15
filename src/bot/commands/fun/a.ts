@@ -5,8 +5,8 @@ import { ICommand } from "../../../structure";
 
 export default class ACommand implements ICommand {
 	client: ChishikiClient;
-	scope = "private" as const;
 	data = new SlashCommandBuilder().setName("a").setDescription("a");
+	scope: "public" | "private" | "custom" = "private";
 
 	constructor(client: ChishikiClient) {
 		this.client = client;
